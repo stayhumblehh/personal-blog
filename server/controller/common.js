@@ -47,6 +47,21 @@ async function getAll(model) {
         'data': res
     }
 }
+async function getAllCount(model) {
+    const count = await model.count()
+    return count
+}
+async function queryByLimit(model, page = 1, limit = 10) {
+    const skip = (page - 1 ) * limit
+    const res = await model.find({}).skip(skip).limit(limit)
+    const count = await getAllCount(model)
+    console.log(count)
+    return  {
+        'status' : '1',
+        'data': res,
+        'count': count
+    }
+}
 async function getById(model, id) {
     const res = await model.findById(id)
     return {
@@ -59,5 +74,6 @@ module.exports = {
     modify,
     drop,
     getAll,
-    getById
+    getById,
+    queryByLimit
 }

@@ -17,9 +17,19 @@
       </template>
     </el-table-column>
   </el-table>
+  <el-pagination
+      :hide-on-single-page="visible"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="page"
+      :page-sizes="[1, 2, 3, 4, 5]"
+      :page-size="limit"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+  </el-pagination>
 </template>
 <script>
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import request from './../../utils/request'
@@ -30,9 +40,15 @@ export default defineComponent({
     setup() {
         const tableData = ref([])
         const { push }  = useRouter()
+        //pagination
+        const page = ref(1)
+        const limit = ref(10)
+        const total = ref(0)
+
         const getList = async () => {
-            const res =  await request.get('/common/categories')
+            const res =  await request.get(`/common/categories?page=${page.value}&limit=${limit.value}`)
             tableData.value = res.data.data
+            total.value = res.data.count
         }
         const handleEdit = (idx, val) => {
             console.log('edit')
@@ -64,11 +80,27 @@ export default defineComponent({
                 })
             })   
         }
+        const handleSizeChange = async (val) => {
+           limit.value = val
+           await getList()
+        }
+        const handleCurrentChange = async (val) => {
+            page.value = val
+            await getList()
+        }
+        const visible = computed(() => (limit.value >= total.value) )
         getList()
+        
         return {
             tableData,
             handleEdit,
-            handleDelete
+            handleDelete,
+            page,
+            limit,
+            total,
+            visible,
+            handleSizeChange,
+            handleCurrentChange
         }
     },
 })

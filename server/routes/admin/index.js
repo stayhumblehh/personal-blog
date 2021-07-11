@@ -13,7 +13,9 @@
     })
     router.get('/', async (ctx, next) => {
         await next()
-        const res = await common.getAll(ctx.model)
+        console.log(ctx.query)
+        const { page = 1, limit = 10 } = ctx.query
+        const res = await common.queryByLimit(ctx.model, Number(page), Number(limit))
  
         ctx.body = res
     })
@@ -29,7 +31,7 @@
         const { name } = ctx.request.body
         const id = ctx.params.id
         const res = await common.modify(ctx.model, id,  name)
-        
+
         ctx.body = res
     })
     router.delete('/:id', async (ctx, next) => {
