@@ -1,15 +1,14 @@
 //  const model = require('./../models/model')
 
-async function create(model, val) {
-    const isExist = await model.exists({name : val})
+async function create(model, obj) {
+    const { name = '' } = obj
+    const isExist = await model.exists({name})
     if(isExist) return {
         'status': '-1',
         'message': `新建失败，数据库中已存在。`
     }
 
-    await model.create({
-        name: val
-    })
+    await model.create(obj)
 
     return {
         'status': '1',
@@ -55,7 +54,7 @@ async function queryByLimit(model, page = 1, limit = 10) {
     const skip = (page - 1 ) * limit
     const res = await model.find({}).skip(skip).limit(limit)
     const count = await getAllCount(model)
-    console.log(count)
+
     return  {
         'status' : '1',
         'data': res,

@@ -9,16 +9,28 @@ const routes = [
     children: [
       {
         path: '/categories/create',
-        component: () => import(/* webpackChunkName: "about" */ './../pages/Category/CategoryCreate.vue')
+        component: () => import(/* webpackChunkName: "category" */ './../pages/Category/CategoryCreate.vue')
       },
       {
         path: '/categories/list',
-        component: () => import(/* webpackChunkName: "about" */ './../pages/Category/CategoryList.vue')
+        component: () => import(/* webpackChunkName: "category" */ './../pages/Category/CategoryList.vue')
       },
       {
         path: '/categories/edit/:id',
-        component: () => import(/* webpackChunkName: "about" */ './../pages/Category/CategoryCreate.vue'),
+        component: () => import(/* webpackChunkName: "category" */ './../pages/Category/CategoryCreate.vue'),
         props: true
+      },
+      {
+        path: 'articles/create',
+        component: () => import(/* webpackChunkName: "article" */ './../pages/Article/ArticleCreate.vue')
+      },
+      {
+        path: 'articles/list',
+        component: () => import(/* webpackChunkName: "article" */ './../pages/Article/ArticleList.vue')
+      },
+      {
+        path: 'articles/edit/:id',
+        component: () => import(/* webpackChunkName: "article" */ './../pages/Article/ArticleCreate.vue')
       }
     ]
   }
