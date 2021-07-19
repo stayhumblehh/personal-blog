@@ -68,6 +68,8 @@ export default defineComponent({
           });
           push('/categories/list')
         }
+      } catch(e) {
+        console.log(e)
       } finally {
         loading.value = false;
       }

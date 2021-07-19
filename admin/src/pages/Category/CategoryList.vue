@@ -51,9 +51,6 @@ export default defineComponent({
             total.value = res.data.count
         }
         const handleEdit = (idx, val) => {
-            console.log('edit')
-            console.log(`idx: ${idx}`)
-            console.log(`val: ${val}`)
             push(`/categories/edit/${val}`)
         }
         const handleDelete = (idx, id) => {

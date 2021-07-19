@@ -15,16 +15,19 @@ async function create(model, obj) {
         'message': `新建成功。`
     }
 }
-async function modify(model, id, newVal) {
-    const isExist = await model.exists({
-        name: newVal
-    })
+async function modify(model, id, obj) {
+    let isExist = false
+    if(obj.name) {
+        isExist = await model.exists({
+            name: obj.name
+        })
+    }
     if(isExist) return {
         'status': '-1',
         'message': '修改失败，数据库中已存在'
     }
 
-    await model.findByIdAndUpdate(id, {name: newVal})
+    await model.findByIdAndUpdate(id, obj)
 
     return {
         'status': '1',
@@ -52,7 +55,9 @@ async function getAllCount(model) {
 }
 async function queryByLimit(model, page = 1, limit = 10) {
     const skip = (page - 1 ) * limit
-    const res = await model.find({}).skip(skip).limit(limit)
+    // populate关联查询Article的categories字段
+    //用来查询分裂接口也没报错
+    const res = await model.find({}).skip(skip).limit(limit).populate('categories')
     const count = await getAllCount(model)
 
     return  {
@@ -62,7 +67,7 @@ async function queryByLimit(model, page = 1, limit = 10) {
     }
 }
 async function getById(model, id) {
-    const res = await model.findById(id)
+    const res = await model.findById(id).populate('categories')
     return {
         'status': '1',
         'data': res

@@ -19,14 +19,16 @@
             <quill-editor v-model:value="formData.body" class="article-editor"></quill-editor>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" @click="save">保存</el-button>
+            <el-button type="primary" :loading="loading" @click="save">保存</el-button>
         </el-form-item>
     </el-form>
 </template>
 
 <script>
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, reactive, ref, toRaw } from 'vue'
+import { useRouter } from 'vue-router'
 import { quillEditor } from 'vue3-quill'
+import { ElMessage } from 'element-plus'
 // import customQuillModule  from 'customQuillModule'
 // Quill.register('module/customQuillModule', customQuillModule)
 import request from './../../utils/request.js'
@@ -41,25 +43,60 @@ export default defineComponent({
             type: String
         }
     },
-    setup() {
+    setup(props) {
         const options = ref()
         const formData = reactive({
             title: '',
             categories: [],
             body: ''
         })
-        const save = () => {
-            request.post('/common/articles', formData)
+        const { push } = useRouter()
+        const loading = ref(false)
+        const save = async () => {
+            if(formData.title === '' || formData.categories.length === 0 || formData.body === '') return
+            loading.value = true
+
+            try{
+                let res 
+                if(id) { //编辑文章时的接口
+                    res = await request.put(`/common/articles/${id}`, formData)
+                } else {
+                    res = await request.post('/common/articles', formData)
+                }
+                
+                if(res.data.status === '1') {
+                    ElMessage.success({
+                        message: res.data.message,
+                        type: "success",
+                    })
+                    push('/articles/list')
+                }
+            } catch(e) {
+                console.log(e)
+            } finally {
+                loading.value = false
+            }
         }
         const getCategories = async () => {
             const res = await request.get('/common/categories?count=all')
             options.value = res.data.data
         }
-
+        //编辑文章
+        const getArticleDetail = async () => {
+            const res = await request.get(`/common/articles/${id}`)
+            
+            formData.title = res.data.data.title
+            formData.body = res.data.data.body
+            formData.categories = res.data.data.categories.map( obj => obj._id)
+        }
+        const { id } = toRaw(props)
+        //编辑文章时执行
+        id && getArticleDetail()
         getCategories()
         return {
             options,
             formData,
+            loading,
             save
         }
     },

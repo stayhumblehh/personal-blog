@@ -26,17 +26,15 @@
 
         <el-container>
             <el-header style="text-align: right; font-size: 12px">
-                <el-dropdown>
+                <el-dropdown @command="handleCommand">
                     <i class="el-icon-setting" style="margin-right: 15px"></i>
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <el-dropdown-item>查看</el-dropdown-item>
-                            <el-dropdown-item>新增</el-dropdown-item>
-                            <el-dropdown-item>删除</el-dropdown-item>
+                            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
-                <span>王小虎</span>
+                <span>已登录</span>
             </el-header>
 
             <el-main>
@@ -48,9 +46,22 @@
 
 <script>
 import { defineComponent } from 'vue'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
+    name: 'Layout',
     setup() {
+        const { push } = useRouter()
+        const handleCommand = (command) => {
+            if(command === 'logout') {
+                //删除本地token 退出到登录页
+                localStorage.removeItem('personalBlogToken')
+                push('/login')
+            }
+        }
+        return {
+            handleCommand
+        }
     }
 })
 </script>

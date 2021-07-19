@@ -22,19 +22,51 @@
 <script>
 import { ref } from 'vue'
 import request from './../../utils/request'
+import { ElMessageBox, ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 
 export default {
   name: "ArticleList",
   setup() {
     const tableData = ref()
+    const { push } = useRouter()
     const getList = async () => {
         const res = await request.get('/common/articles')
         
         tableData.value = res.data.data        
     }
+    const handleEdit = (idx, val) => {
+        push(`/articles/edit/${val}`)
+    }
+    const handleDelete = (idx, id) => {
+        ElMessageBox.confirm('此操作将删除该文章，是否继续？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        })
+        .then( async () => {
+            try {
+                await request.delete(`/common/articles/${id}`)
+            } finally {
+                ElMessage({
+                    type: 'success',
+                    message: '删除成功！'
+                })
+                getList()
+            }
+        })
+        .catch( () => {
+            ElMessage({
+                type: 'info',
+                message: '已取消删除'
+            })
+        })   
+    }
     getList()
     return {
-        tableData
+        tableData,
+        handleEdit,
+        handleDelete
     }
   }
 }

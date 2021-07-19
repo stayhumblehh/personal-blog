@@ -4,6 +4,7 @@ import Layout from './../components/Layout'
 const routes = [
   {
     path: '/',
+    redirect: '/articles/list',
     name: 'Layout',
     component: Layout,
     children: [
@@ -30,28 +31,33 @@ const routes = [
       },
       {
         path: 'articles/edit/:id',
-        component: () => import(/* webpackChunkName: "article" */ './../pages/Article/ArticleCreate.vue')
+        component: () => import(/* webpackChunkName: "article" */ './../pages/Article/ArticleCreate.vue'),
+        props: true
       }
     ]
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    meta: { isPublic: true},
+    component: () => import(/* webpackChunkName: "login" */ './../pages/Login')
   }
-  // {
-  //   path: '/',
-  //   name: 'Home',
-  //   component: Home
-  // },
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+})
+
+//导航守卫，如果当前路由不是login页并且本地没有token就跳转到login页
+router.beforeEach((to, from, next) => {
+  if(!to.meta.isPublic && !localStorage.personalBlogToken) {
+    next({
+      path: '/login'
+    })
+  } else {
+    next()
+  }
 })
 
 export default router
